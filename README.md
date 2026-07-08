@@ -17,12 +17,12 @@ Python, FastAPI, LangGraph, Qdrant, rank-bm25, OpenAI SDK, aihubmix, Pydantic
 
 ## 启动方式
 
-1. 复制 `.env.example` 为 `.env`，填写你的 aihubmix key。
+1. 复制 `.env.example` 为 `.env`，填写你的 api key。
 
 2. 启动 API：
 
 ```powershell
-cd "E:\实习相关\ai-career-agent-platform"
+cd "...\ai-career-agent-platform"
 D:\an\envs\all-in-rag\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8010
 ```
 
