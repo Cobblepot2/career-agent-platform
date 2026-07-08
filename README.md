@@ -17,7 +17,7 @@ Python, FastAPI, LangGraph, Qdrant, rank-bm25, OpenAI SDK, aihubmix, Pydantic
 
 ## 启动方式
 
-1. 复制 `.env.example` 为 `.env`，填写你的 api key。
+1. 在 .env 填写你的 api key
 
 2. 启动 API：
 
