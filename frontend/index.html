@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI 求职 Agent 平台</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #dde3ee;
+      --accent: #1f6feb;
+      --accent-dark: #174ea6;
+      --ok: #157347;
+      --warn: #a15c00;
+      --soft: #eef4ff;
+      --code: #101828;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    header {
+      padding: 22px 32px 18px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+    }
+    header h1 {
+      margin: 0 0 6px;
+      font-size: 26px;
+      line-height: 1.25;
+    }
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    main {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 18px;
+      padding: 18px 32px 32px;
+    }
+    section, aside {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 8px 28px rgba(16, 24, 40, 0.04);
+    }
+    aside { padding: 18px; height: fit-content; }
+    .workspace { display: grid; gap: 18px; }
+    .card { padding: 18px; }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 17px;
+    }
+    h3 {
+      margin: 16px 0 8px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--accent-dark);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .muted { color: var(--muted); }
+    .grid2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 10px 11px;
+      font: inherit;
+      font-size: 14px;
+      color: var(--ink);
+      background: #fff;
+      outline: none;
+    }
+    textarea { min-height: 118px; resize: vertical; }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.12); }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    button, a.button {
+      border: 0;
+      border-radius: 7px;
+      padding: 10px 13px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    button:hover, a.button:hover { background: var(--accent-dark); }
+    button.secondary, a.secondary {
+      background: #eef2f7;
+      color: var(--ink);
+    }
+    button.secondary:hover, a.secondary:hover { background: #e2e8f0; }
+    pre {
+      margin: 14px 0 0;
+      padding: 14px;
+      border-radius: 8px;
+      background: #0f172a;
+      color: #dbeafe;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 82px;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .doc-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .doc-item {
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      font-size: 13px;
+      background: #fbfcfe;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 14px 18px 0;
+    }
+    .tab {
+      background: #eef2f7;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+    .tab.active { background: var(--accent); color: #fff; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .note {
+      padding: 10px 12px;
+      border-left: 4px solid var(--warn);
+      background: #fff8eb;
+      color: #583500;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    footer {
+      padding: 0 32px 28px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    @media (max-width: 920px) {
+      main { grid-template-columns: 1fr; padding: 14px; }
+      header { padding: 18px 14px; }
+      .grid2 { grid-template-columns: 1fr; }
+      footer { padding: 0 14px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI 求职 Agent 平台</h1>
+    <p>基于 FastAPI、Qdrant、Hybrid Retrieval 和 LangGraph 的中文求职分析界面</p>
+  </header>
+
+  <main>
+    <aside>
+      <h2>系统状态</h2>
+      <div class="status" id="healthBox">
+        <span class="pill">正在检查服务...</span>
+      </div>
+      <div class="actions">
+        <button class="secondary" onclick="loadHealth()">刷新状态</button>
+        <a class="button secondary" href="/docs" target="_blank">打开接口文档</a>
+      </div>
+      <h3>资料库文件</h3>
+      <div class="doc-list" id="documentsBox"></div>
+      <div class="note">新增或修改 data 资料后，需要先点击“重建索引”。这一步会调用 embedding，可能消耗 API 额度。</div>
+    </aside>
+
+    <div class="workspace">
+      <section>
+        <div class="tabs">
+          <button class="tab active" data-panel="indexPanel">索引管理</button>
+          <button class="tab" data-panel="searchPanel">混合检索</button>
+          <button class="tab" data-panel="answerPanel">RAG 问答</button>
+          <button class="tab" data-panel="agentPanel">Agent 岗位匹配</button>
+          <button class="tab" data-panel="evalPanel">本地评测</button>
+        </div>
+
+        <div class="card panel active" id="indexPanel">
+          <h2>索引管理</h2>
+          <p class="muted">读取 data/ 下的简历、岗位 JD、项目笔记，切分为 chunk，生成 embedding 并写入 Qdrant 本地向量库。</p>
+          <div class="actions">
+            <button onclick="rebuildIndex()">重建索引</button>
+            <button class="secondary" onclick="loadDocuments()">刷新资料列表</button>
+          </div>
+          <pre id="indexOutput">等待操作...</pre>
+        </div>
+
+        <div class="card panel" id="searchPanel">
+          <h2>混合检索</h2>
+          <div class="grid2">
+            <div>
+              <label>检索问题</label>
+              <textarea id="searchQuery">Python FastAPI RAG 向量数据库 AI 应用开发</textarea>
+            </div>
+            <div>
+              <label>资料范围</label>
+              <select id="searchSource">
+                <option value="">全部资料</option>
+                <option value="resume">只查简历 resume</option>
+                <option value="jobs">只查岗位 jobs</option>
+                <option value="projects">只查项目 projects</option>
+                <option value="notes">只查笔记 notes</option>
+              </select>
+              <h3>Top K</h3>
+              <input id="searchTopK" type="number" min="1" max="20" value="5" />
+            </div>
+          </div>
+          <div class="actions"><button onclick="hybridSearch()">开始检索</button></div>
+          <pre id="searchOutput">等待检索...</pre>
+        </div>
+
+        <div class="card panel" id="answerPanel">
+          <h2>RAG 问答</h2>
+          <label>问题</label>
+          <textarea id="answerQuestion">请基于资料判断候选人是否适合 AI 应用开发实习，并给出证据。</textarea>
+          <div class="grid2">
+            <div>
+              <label>资料范围</label>
+              <select id="answerSource">
+                <option value="">全部资料</option>
+                <option value="resume">只查简历 resume</option>
+                <option value="jobs">只查岗位 jobs</option>
+                <option value="projects">只查项目 projects</option>
+                <option value="notes">只查笔记 notes</option>
+              </select>
+            </div>
+            <div>
+              <label>Top K</label>
+              <input id="answerTopK" type="number" min="1" max="20" value="5" />
+            </div>
+          </div>
+          <div class="actions"><button onclick="askAnswer()">生成回答</button></div>
+          <pre id="answerOutput">等待回答...</pre>
+        </div>
+
+        <div class="card panel" id="agentPanel">
+          <h2>Agent 岗位匹配</h2>
+          <p class="muted">LangGraph 会依次执行：JD 抽取、简历解析、证据检索、匹配评分、报告审查。</p>
+          <label>岗位 JD</label>
+          <textarea id="jobDescription">AI 应用开发实习生：熟悉 Python 和 FastAPI，了解 RAG、Embedding、向量数据库、Prompt Engineering，能够调用 OpenAI-compatible API，有 Agent、知识库问答或 AI 产品项目经验优先。</textarea>
+          <div class="grid2">
+            <div>
+              <label>Top K</label>
+              <input id="agentTopK" type="number" min="1" max="20" value="6" />
+            </div>
+          </div>
+          <div class="actions"><button onclick="matchJob()">生成匹配报告</button></div>
+          <pre id="agentOutput">等待分析...</pre>
+        </div>
+
+        <div class="card panel" id="evalPanel">
+          <h2>本地评测</h2>
+          <p class="muted">基于 eval/golden_questions.jsonl，评估 keyword_recall、source_type_hit、citation_coverage 和 latency。</p>
+          <div class="actions"><button onclick="runEval()">运行评测</button></div>
+          <pre id="evalOutput">等待评测...</pre>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>提示：如果接口返回索引不存在，请先进入“索引管理”重建索引。</footer>
+
+  <script>
+    const pretty = (data) => JSON.stringify(data, null, 2);
+
+    async function requestJson(url, options = {}) {
+      const response = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options,
+      });
+      const data = await response.json().catch(() => ({ error: '响应不是 JSON' }));
+      if (!response.ok) throw data;
+      return data;
+    }
+
+    function sourceValue(id) {
+      const value = document.getElementById(id).value;
+      return value ? value : null;
+    }
+
+    function setOutput(id, data) {
+      document.getElementById(id).textContent = typeof data === 'string' ? data : pretty(data);
+    }
+
+    async function loadHealth() {
+      const box = document.getElementById('healthBox');
+      try {
+        const data = await requestJson('/health');
+        box.innerHTML = `
+          <span class="pill">服务正常</span>
+          <div>项目目录：${data.project_dir}</div>
+          <div>索引状态：${data.chunks_ready ? '已建立' : '未建立'}</div>
+          <div>向量集合：${data.collection}</div>
+        `;
+      } catch (error) {
+        box.innerHTML = `<span class="pill">服务异常</span><div>${pretty(error)}</div>`;
+      }
+    }
+
+    async function loadDocuments() {
+      const box = document.getElementById('documentsBox');
+      try {
+        const data = await requestJson('/documents');
+        if (!data.documents.length) {
+          box.innerHTML = '<div class="doc-item">暂无资料文件</div>';
+          return;
+        }
+        box.innerHTML = data.documents.map(doc => `
+          <div class="doc-item"><strong>${doc.source_type}</strong><br>${doc.path}<br><span class="muted">${doc.size_bytes} bytes</span></div>
+        `).join('');
+      } catch (error) {
+        box.innerHTML = `<div class="doc-item">加载失败：${pretty(error)}</div>`;
+      }
+    }
+
+    async function rebuildIndex() {
+      setOutput('indexOutput', '正在重建索引，请稍候...');
+      try {
+        const data = await requestJson('/index/rebuild', { method: 'POST' });
+        setOutput('indexOutput', data);
+        await loadHealth();
+      } catch (error) {
+        setOutput('indexOutput', error);
+      }
+    }
+
+    async function hybridSearch() {
+      setOutput('searchOutput', '正在检索...');
+      try {
+        const data = await requestJson('/search/hybrid', {
+          method: 'POST',
+          body: JSON.stringify({
+            query: document.getElementById('searchQuery').value,
+            top_k: Number(document.getElementById('searchTopK').value),
+            source_type: sourceValue('searchSource'),
+          }),
+        });
+        setOutput('searchOutput', data);
+      } catch (error) {
+        setOutput('searchOutput', error);
+      }
+    }
+
+    async function askAnswer() {
+      setOutput('answerOutput', '正在生成回答...');
+      try {
+        const data = await requestJson('/answer', {
+          method: 'POST',
+          body: JSON.stringify({
+            question: document.getElementById('answerQuestion').value,
+            top_k: Number(document.getElementById('answerTopK').value),
+            source_type: sourceValue('answerSource'),
+          }),
+        });
+        setOutput('answerOutput', data);
+      } catch (error) {
+        setOutput('answerOutput', error);
+      }
+    }
+
+    async function matchJob() {
+      setOutput('agentOutput', '正在运行 Agent 工作流...');
+      try {
+        const data = await requestJson('/agent/match-job', {
+          method: 'POST',
+          body: JSON.stringify({
+            job_description: document.getElementById('jobDescription').value,
+            top_k: Number(document.getElementById('agentTopK').value),
+          }),
+        });
+        setOutput('agentOutput', data);
+      } catch (error) {
+        setOutput('agentOutput', error);
+      }
+    }
+
+    async function runEval() {
+      setOutput('evalOutput', '正在运行评测...');
+      try {
+        const data = await requestJson('/eval/run', { method: 'POST' });
+        setOutput('evalOutput', data);
+      } catch (error) {
+        setOutput('evalOutput', error);
+      }
+    }
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.panel).classList.add('active');
+      });
+    });
+
+    loadHealth();
+    loadDocuments();
+  </script>
+</body>
+</html>

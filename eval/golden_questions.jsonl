@@ -1,0 +1,2 @@
+{"question":"候选人是否适合 AI 应用开发实习？","expected_keywords":["Python","FastAPI","RAG","Embedding"],"expected_source_types":["resume","projects"]}
+{"question":"目标岗位最看重哪些能力？","expected_keywords":["Python","FastAPI","向量数据库","OpenAI-compatible API"],"expected_source_types":["jobs"]}
